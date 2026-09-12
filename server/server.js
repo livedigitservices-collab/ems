@@ -81,14 +81,25 @@ app.use("/api/internal",      internalRouter)
 
 app.get("/", (req, res) => res.send("Server running successfully"))
 
-startAutoCheckoutJob()
+const startServer = async () => {
+    try {
+        await connectDB()
 
-if (!process.env.VERCEL) {
-    startBirthdayAnnouncementJob()
+        startAutoCheckoutJob()
+
+        if (!process.env.VERCEL) {
+            startBirthdayAnnouncementJob()
+        }
+
+        if (!process.env.VERCEL) {
+            app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+        }
+    } catch (err) {
+        console.error("Failed to start server:", err)
+        process.exit(1)
+    }
 }
 
-if (process.env.NODE_ENV !== "production") {
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
-}
+startServer()
 
 export default app
